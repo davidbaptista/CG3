@@ -57,7 +57,6 @@ function createBox(l, h, w) {
 
 function createChassis() {
 	'use strict';
-	let chassis = new THREE.Object3D();
 
 	const thickness = 0.5;
 	let b1 = createBox(15, thickness, thickness);
@@ -74,8 +73,8 @@ function createChassis() {
 	b4.translateX(7.25);
 	b4.rotateY(-Math.PI / 2);
 
-	let b5 = createBox(6, thickness, thickness)
-	b5.translateX(-7.25);
+	let b5 = createBox(6.5, thickness, thickness)
+	b5.translateX(-7.5);
 	b5.rotateY(Math.PI / 2);
 
 	let b6 = createBox(9, thickness, thickness)
@@ -125,29 +124,102 @@ function createChassis() {
 	let c4 = createCylinder(2, 1.5);
 	c4.translateX(13.5);
 	c4.translateZ(-5);
-	c4.rotateX(-Math.PI / 2);
+    c4.rotateX(-Math.PI / 2);
+    
+    obj = new THREE.Object3D();
 
-	chassis.add(b1);
-	chassis.add(b2);
-	chassis.add(b3);
-	chassis.add(b4);
-	chassis.add(b5);
-	chassis.add(b6);
-	chassis.add(b7);
-	chassis.add(b8);
-	chassis.add(b9);
-	chassis.add(b10);
-	chassis.add(b11);
-	chassis.add(b12);
-	chassis.add(c1);
-	chassis.add(c2);
-	chassis.add(c3);
-	chassis.add(c4);
+	obj.add(b1);
+	obj.add(b2);
+	obj.add(b3);
+	obj.add(b4);
+	obj.add(b5);
+	obj.add(b6);
+	obj.add(b7);
+	obj.add(b8);
+	obj.add(b9);
+	obj.add(b10);
+	obj.add(b11);
+	obj.add(b12);
+	obj.add(c1);
+	obj.add(c2);
+	obj.add(c3);
+	obj.add(c4);
 
-	scene.add(chassis);
+    scene.add(obj);
 	
-	chassis.translateY(3);
-	chassis.translateX(-4.25);
+	//obj.translateY(3);
+    obj.translateX(4.25);
+    return obj;
+}
+
+function createBody() {
+    'use strict'
+
+    let body = new THREE.Geometry();
+ 
+    body.vertices.push(
+        new THREE.Vector3(0, 0, 5),
+        new THREE.Vector3(19, 0, 5),
+        new THREE.Vector3(23, 1, 5),
+        new THREE.Vector3(24, 1, 5),
+        new THREE.Vector3(25, 6, 5),
+        new THREE.Vector3(11, 8, 4),
+        new THREE.Vector3(0, 4, 5),
+        new THREE.Vector3(3, 4, 5),
+        new THREE.Vector3(11, 7, 4.75),
+        new THREE.Vector3(16, 6, 5),
+        new THREE.Vector3(16, 4.5, 5),
+
+        
+        new THREE.Vector3(0, 0, -5),
+        new THREE.Vector3(19, 0, -5),
+        new THREE.Vector3(23, 1, -5),
+        new THREE.Vector3(24, 1, -5),
+        new THREE.Vector3(25, 6, -5),
+        new THREE.Vector3(11, 8, -4),
+        new THREE.Vector3(0, 4, -5),
+        new THREE.Vector3(3, 4, -5),
+        new THREE.Vector3(11, 7, -4.75),
+        new THREE.Vector3(16, 6, -5),
+        new THREE.Vector3(16, 4.5, -5));
+
+ 
+    body.faces.push(
+ 
+        new THREE.Face3(0, 6, 7),
+        new THREE.Face3(0, 1, 7),
+        new THREE.Face3(1, 7, 10),
+        new THREE.Face3(1, 2, 10),
+        new THREE.Face3(2, 9, 10),
+        new THREE.Face3(2, 3, 9),
+        new THREE.Face3(3, 4, 9),
+        new THREE.Face3(4, 5, 9),
+        new THREE.Face3(5, 8, 9),
+        new THREE.Face3(5, 6, 8),
+        new THREE.Face3(6, 7, 8),
+
+        new THREE.Face3(0+11, 6+11, 7+11),
+        new THREE.Face3(0+11, 1+11, 7+11),
+        new THREE.Face3(1+11, 7+11, 10+11),
+        new THREE.Face3(1+11, 2+11, 10+11),
+        new THREE.Face3(2+11, 9+11, 10+11),
+        new THREE.Face3(2+11, 3+11, 9+11),
+        new THREE.Face3(3+11, 4+11, 9+11),
+        new THREE.Face3(4+11, 5+11, 9+11),
+        new THREE.Face3(5+11, 8+11, 9+11),
+        new THREE.Face3(5+11, 6+11, 8+11),
+        new THREE.Face3(6+11, 7+11, 8+11));
+
+ 
+    body.computeVertexNormals();
+    //body.normalize();
+    material = new THREE.MeshBasicMaterial({side: THREE.DoubleSide});
+    mesh = new THREE.Mesh(body, material)
+    obj = new THREE.Object3D();
+    obj.add(mesh);
+    scene.add(obj);
+
+    return obj;
 }
 
 function createScene() {
@@ -157,10 +229,13 @@ function createScene() {
 
 	scene.add(new THREE.AxisHelper(10));
 
-	createFloor(50);
-	let stage = createCylinder(15, 2);
-	stage.children[0].material.color.setHex(0xffff00);
-	createChassis();
+	//createFloor(50);
+	//let stage = createCylinder(15, 2);
+	//stage.children[0].material.color.setHex(0xffff00);
+    let chassis = createChassis();
+    chassis.rotateY(Math.PI)
+    let body = createBody();
+    body.translateX(-12);
 }
 
 function createCamera() {
@@ -168,8 +243,8 @@ function createCamera() {
 	const cameraSize = 25;
 	camera = new THREE.OrthographicCamera(-cameraSize, cameraSize, cameraSize*aspectRatio, -cameraSize*aspectRatio, 1, 1000);
 	//camera = new THREE.PerspectiveCamera(70,  window.innerWidth / window.innerHeight, 1, 1000);
-    camera.position.x = 0;
-    camera.position.y = 0;
+    camera.position.x = 20;
+    camera.position.y = 20;
     camera.position.z = 20;
     camera.lookAt(scene.position);
 }
