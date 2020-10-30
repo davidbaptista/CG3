@@ -9,18 +9,62 @@ function createScene() {
 
     scene = new THREE.Scene();
 
-    scene.add(new THREE.AxisHelper(10));
+	scene.add(new THREE.AxisHelper(10));
 
-    createTable(0, 8, 0);
-    createBall(0, 0, 15);
+    // GEOMETRY
+    geometry = new THREE.Geometry();
+ 
+    // create an array of vertices by way of
+    // and array of vector3 instances
+    geometry.vertices.push(
+        new THREE.Vector3(0, 0, 0),
+        new THREE.Vector3(1, 0, 0),
+        new THREE.Vector3(1, 1, 0),
+        new THREE.Vector3(0, 1, 0),
+ 
+        new THREE.Vector3(0, 0, -1),
+        new THREE.Vector3(1, 0, -1),
+        new THREE.Vector3(1, 1, -1),
+        new THREE.Vector3(0, 1, -1));
+ 
+    // create faces by way of an array of
+    // face3 instances. (you just play connect
+    // the dots with index values from the
+    // vertices array)
+    geometry.faces.push(
+        new THREE.Face3(0, 1, 2),
+        new THREE.Face3(3, 0, 2),
+        new THREE.Face3(4, 5, 6),
+        new THREE.Face3(7, 4, 6),
+ 
+        new THREE.Face3(0, 4, 1),
+        new THREE.Face3(1, 4, 5),
+        new THREE.Face3(3, 7, 2),
+        new THREE.Face3(2, 7, 6));
+
+    // compute Normals
+    geometry.computeVertexNormals();
+ 
+    // normalize the geometry
+    geometry.normalize();
+ 
+    // MESH with GEOMETRY, and Normal MATERIAL
+    scene.add(new THREE.Mesh(
+		// geometry as first argument
+		geometry,
+
+		// then Material
+		new THREE.MeshNormalMaterial({
+			side: THREE.DoubleSide
+		})));
 }
 
 function createCamera() {
     'use strict';
     camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 1000);
-    camera.position.x = 50;
-    camera.position.y = 50;
-    camera.position.z = 50;
+    camera.position.x = 2;
+    camera.position.y = 2;
+    camera.position.z = 2;
     camera.lookAt(scene.position);
 }
 
