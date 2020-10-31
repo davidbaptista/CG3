@@ -1,5 +1,3 @@
-/*global THREE, requestAnimationFrame, console*/
-
 let camera, scene, renderer;
 
 let geometry, material, mesh, obj;
@@ -262,7 +260,65 @@ function createBody() {
 }
 
 function createWindows() {
-	'use strict'
+    'use strict'
+    
+    let leftWindow = new THREE.Geometry();
+    let rightWindow = new THREE.Geometry();
+    let frontWindow = new THREE.Geometry();
+
+    leftWindow.vertices.push (
+        new THREE.Vector3(3, 4, 5),
+        new THREE.Vector3(11, 7, 4.75),
+        new THREE.Vector3(16, 6, 5),
+        new THREE.Vector3(16, 4.5, 5),
+    );
+
+    leftWindow.faces.push (
+        new THREE.Face3(0, 1, 2),
+        new THREE.Face3(0, 2, 3)
+    );
+
+    rightWindow.vertices.push (
+        new THREE.Vector3(3, 4, -5),
+        new THREE.Vector3(11, 7, -4.75),
+        new THREE.Vector3(16, 6, -5),
+        new THREE.Vector3(16, 4.5, -5),
+    );
+
+    rightWindow.faces.push (
+        new THREE.Face3(0, 1, 2),
+        new THREE.Face3(0, 2, 3)
+    );
+
+    frontWindow.vertices.push(
+        new THREE.Vector3(4, 5.7, 3.50),
+        new THREE.Vector3(9, 7.5, 3.25),
+        new THREE.Vector3(4, 5.7, -3.50),
+        new THREE.Vector3(9, 7.5, -3.25),
+    );
+
+    frontWindow.faces.push(
+        new THREE.Face3(0, 1, 2),
+        new THREE.Face3(3, 2, 1)
+    );
+
+    leftWindow.computeVertexNormals();
+    material = new THREE.MeshLambertMaterial({side: THREE.DoubleSide});
+    mesh = new THREE.Mesh(leftWindow, material);
+    obj = new THREE.Object3D();
+    obj.add(mesh);
+    obj.translateX(-12);
+    scene.add(obj);
+
+    rightWindow.computeVertexNormals();
+    mesh = new THREE.Mesh(rightWindow, material);
+    obj.add(mesh);
+    scene.add(obj);
+
+    frontWindow.computeVertexNormals();
+    mesh = new THREE.Mesh(frontWindow, material);
+    obj.add(mesh);
+    scene.add(obj);
 }
 
 function createScene() {
@@ -278,7 +334,13 @@ function createScene() {
     let chassis = createChassis();
     chassis.rotateY(Math.PI)
     let body = createBody();
+    createWindows();
     body.translateX(-12);
+
+    let directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
+    directionalLight.position.set(1, 1, 1);
+    directionalLight.shadow = true;
+    scene.add( directionalLight );
 }
 
 function createCamera() {
@@ -288,7 +350,7 @@ function createCamera() {
 	camera = new THREE.PerspectiveCamera(70,  window.innerWidth / window.innerHeight, 1, 1000);
     camera.position.x = -20;
     camera.position.y = 20;
-	camera.position.z = 20;
+	camera.position.z = -20;
     camera.lookAt(scene.position);
 }
 
