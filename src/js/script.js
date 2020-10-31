@@ -6,7 +6,6 @@ let geometry, material, mesh, obj;
 
 const aspectRatio = window.innerHeight / window.innerWidth;
 
-
 function createFloor(s) {
 	'use strict';
 
@@ -148,7 +147,7 @@ function createChassis() {
     scene.add(obj);
 	
 	//obj.translateY(3);
-    obj.translateX(4.25);
+	obj.translateX(4.25);
     return obj;
 }
 
@@ -158,7 +157,7 @@ function createBody() {
     let body = new THREE.Geometry();
  
     body.vertices.push(
-        new THREE.Vector3(0, 0, 5),
+		new THREE.Vector3(0, 0, 5),
         new THREE.Vector3(19, 0, 5),
         new THREE.Vector3(23, 1, 5),
         new THREE.Vector3(24, 1, 5),
@@ -169,8 +168,8 @@ function createBody() {
         new THREE.Vector3(11, 7, 4.75),
         new THREE.Vector3(16, 6, 5),
         new THREE.Vector3(16, 4.5, 5),
+		// 11
 
-        
         new THREE.Vector3(0, 0, -5),
         new THREE.Vector3(19, 0, -5),
         new THREE.Vector3(23, 1, -5),
@@ -181,11 +180,23 @@ function createBody() {
         new THREE.Vector3(3, 4, -5),
         new THREE.Vector3(11, 7, -4.75),
         new THREE.Vector3(16, 6, -5),
-        new THREE.Vector3(16, 4.5, -5));
+		new THREE.Vector3(16, 4.5, -5),
+        // 22
+		
+		new THREE.Vector3(-1, 1, 3),
+		new THREE.Vector3(-1, 4, 3),
+		new THREE.Vector3(3, 5, 5),
+		//25
+
+		new THREE.Vector3(-1, 1, -3),
+		new THREE.Vector3(-1, 4, -3),
+		new THREE.Vector3(3, 5, -5),
+		//28
+		);
 
  
     body.faces.push(
- 
+		// left side
         new THREE.Face3(0, 6, 7),
         new THREE.Face3(0, 1, 7),
         new THREE.Face3(1, 7, 10),
@@ -198,6 +209,7 @@ function createBody() {
         new THREE.Face3(5, 6, 8),
         new THREE.Face3(6, 7, 8),
 
+		// right side
         new THREE.Face3(0+11, 6+11, 7+11),
         new THREE.Face3(0+11, 1+11, 7+11),
         new THREE.Face3(1+11, 7+11, 10+11),
@@ -208,18 +220,49 @@ function createBody() {
         new THREE.Face3(4+11, 5+11, 9+11),
         new THREE.Face3(5+11, 8+11, 9+11),
         new THREE.Face3(5+11, 6+11, 8+11),
-        new THREE.Face3(6+11, 7+11, 8+11));
+		new THREE.Face3(6+11, 7+11, 8+11),
 
+		// front side 
+		new THREE.Face3(5, 6, 23),
+		new THREE.Face3(5+11, 6+11, 26),
+		new THREE.Face3(5, 5+11, 26),
+		new THREE.Face3(5, 23, 26),
+
+		// left light
+		new THREE.Face3(0, 22, 23),
+		new THREE.Face3(0, 6, 23),
+
+		// right light
+		new THREE.Face3(11, 25, 26),
+		new THREE.Face3(11, 6 + 11, 26),
+
+		// bumper
+		new THREE.Face3(22, 23, 25),
+		new THREE.Face3(23, 25, 26),
+
+		// rear
+		new THREE.Face3(3, 4, 3+11),
+		new THREE.Face3(4, 3+11, 4+11),
+
+		// reat top part
+		new THREE.Face3(4, 4+11, 5),
+		new THREE.Face3(5, 4+11, 5+11),
+		);
+		
  
     body.computeVertexNormals();
     //body.normalize();
-    material = new THREE.MeshBasicMaterial({side: THREE.DoubleSide});
+    material = new THREE.MeshNormalMaterial({side: THREE.DoubleSide});
     mesh = new THREE.Mesh(body, material)
     obj = new THREE.Object3D();
     obj.add(mesh);
     scene.add(obj);
 
     return obj;
+}
+
+function createWindows() {
+	'use strict'
 }
 
 function createScene() {
@@ -241,11 +284,11 @@ function createScene() {
 function createCamera() {
 	'use strict';
 	const cameraSize = 25;
-	camera = new THREE.OrthographicCamera(-cameraSize, cameraSize, cameraSize*aspectRatio, -cameraSize*aspectRatio, 1, 1000);
-	//camera = new THREE.PerspectiveCamera(70,  window.innerWidth / window.innerHeight, 1, 1000);
-    camera.position.x = 20;
+	//camera = new THREE.OrthographicCamera(-cameraSize, cameraSize, cameraSize*aspectRatio, -cameraSize*aspectRatio, 1, 1000);
+	camera = new THREE.PerspectiveCamera(70,  window.innerWidth / window.innerHeight, 1, 1000);
+    camera.position.x = -20;
     camera.position.y = 20;
-    camera.position.z = 20;
+	camera.position.z = 20;
     camera.lookAt(scene.position);
 }
 
