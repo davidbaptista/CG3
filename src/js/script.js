@@ -15,7 +15,9 @@ function createFloor(s) {
 
 	geometry = new THREE.PlaneGeometry(s, s, 1);
 	material = new THREE.MeshStandardMaterial({color: 0x78829C, wireframe: false});
-	mesh = new THREE.Mesh(geometry, material);
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
 
     mesh.position.set(0, 0, 0);
 	obj = new THREE.Object3D();
@@ -31,13 +33,14 @@ function createFloor(s) {
 function createCylinder(w, h) {
 	'use strict';
 
-	geometry = new THREE.CylinderGeometry(w, w, h, 64);
-	material = new THREE.MeshBasicMaterial({color: 0xBDC0C7});
-	mesh = new THREE.Mesh(geometry, material);
-
+    geometry = new THREE.CylinderGeometry(w, w, h, 64);
+	material = new THREE.MeshStandardMaterial({color: 0xBDC0C7});
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.receiveShadow = true;
+    mesh.castShadow = true;
 	mesh.position.set(0, 0, 0);
 	obj = new THREE.Object3D();
-	obj.add(mesh);
+    obj.add(mesh);
 
 	scene.add(obj);
 
@@ -48,9 +51,11 @@ function createBox(l, h, w) {
     'use strict';
 
     geometry = new THREE.CubeGeometry(l, h, w);
-    material = new THREE.MeshBasicMaterial({color: 0x3D3D3D});
+    material = new THREE.MeshPhongMaterial({color: 0x3D3D3D});
     mesh = new THREE.Mesh(geometry, material);
-	mesh.position.set(0, 0, 0);
+    mesh.position.set(0, 0, 0);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
 	
 	obj = new THREE.Object3D();
 	obj.add(mesh);
@@ -62,7 +67,7 @@ function createSphere(r) {
 	'use strict'
 
 	geometry = new THREE.SphereGeometry(r, 16, 16)
-	material = new THREE.MeshBasicMaterial({color: 0x303030, wireframe: false});
+	material = new THREE.MeshPhongMaterial({color: 0x303030, wireframe: false});
 	mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(0, 0, 0);
     obj = new THREE.Object3D();
@@ -75,7 +80,7 @@ function createCone(r) {
 	'use strict'
 
 	geometry = new THREE.ConeGeometry(r, r, 32)
-	material = new THREE.MeshBasicMaterial({color: 0x303030, wireframe: false});
+	material = new THREE.MeshPhongMaterial({color: 0x303030, wireframe: false});
 	mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(0, 0, 0);
     obj = new THREE.Object3D();
@@ -224,9 +229,9 @@ function createBody() {
  
     body.faces.push(
 		// left side
-        new THREE.Face3(0, 6, 7),
+        new THREE.Face3(7, 6, 0),
         new THREE.Face3(0, 1, 7),
-        new THREE.Face3(1, 7, 10),
+        new THREE.Face3(10, 7, 1),
         new THREE.Face3(1, 2, 10),
         new THREE.Face3(2, 9, 10),
         new THREE.Face3(2, 3, 9),
@@ -238,37 +243,37 @@ function createBody() {
 
 		// right side
         new THREE.Face3(0+11, 6+11, 7+11),
-        new THREE.Face3(0+11, 1+11, 7+11),
+        new THREE.Face3(7+11, 1+11, 0+11),
         new THREE.Face3(1+11, 7+11, 10+11),
-        new THREE.Face3(1+11, 2+11, 10+11),
-        new THREE.Face3(2+11, 9+11, 10+11),
-        new THREE.Face3(2+11, 3+11, 9+11),
-        new THREE.Face3(3+11, 4+11, 9+11),
-        new THREE.Face3(4+11, 5+11, 9+11),
-        new THREE.Face3(5+11, 8+11, 9+11),
-        new THREE.Face3(5+11, 6+11, 8+11),
-		new THREE.Face3(6+11, 7+11, 8+11),
+        new THREE.Face3(10+11, 2+11, 1+11),
+        new THREE.Face3(10+11, 9+11, 2+11),
+        new THREE.Face3(9+11, 3+11, 2+11),
+        new THREE.Face3(9+11, 4+11, 3+11),
+        new THREE.Face3(9+11, 5+11, 4+11),
+        new THREE.Face3(9+11, 8+11, 5+11),
+        new THREE.Face3(8+11, 6+11, 5+11),
+		new THREE.Face3(8+11, 7+11, 6+11),
 
 		// front side 
-		new THREE.Face3(5, 6, 23),
+		new THREE.Face3(23, 6, 5),
 		new THREE.Face3(5+11, 6+11, 26),
 		new THREE.Face3(5, 5+11, 26),
-		new THREE.Face3(5, 23, 26),
+		new THREE.Face3(26, 23, 5),
 
 		// left light
-		new THREE.Face3(0, 22, 23),
+		new THREE.Face3(23, 22, 0),
 		new THREE.Face3(0, 6, 23),
 
 		// right light
 		new THREE.Face3(11, 25, 26),
-		new THREE.Face3(11, 6 + 11, 26),
+		new THREE.Face3(26, 6 + 11, 11),
 
 		// bumper
 		new THREE.Face3(22, 23, 25),
-		new THREE.Face3(23, 25, 26),
+		new THREE.Face3(26, 25, 23),
 
 		// rear
-		new THREE.Face3(3, 4, 3+11),
+		new THREE.Face3(3+11, 4, 3),
 		new THREE.Face3(4, 3+11, 4+11),
 
 		// reat top part
@@ -279,7 +284,7 @@ function createBody() {
  
     body.computeVertexNormals();
     //body.normalize();
-    material = new THREE.MeshBasicMaterial({side: THREE.DoubleSide, color:0x808080});
+    material = new THREE.MeshPhongMaterial({color:0x808080});
     mesh = new THREE.Mesh(body, material)
     mesh.castShadow = true;
     mesh.receiveShadow = true;
@@ -304,8 +309,8 @@ function createWindows() {
     );
 
     leftWindow.faces.push (
-        new THREE.Face3(0, 1, 2),
-        new THREE.Face3(0, 2, 3)
+        new THREE.Face3(2, 1, 0),
+        new THREE.Face3(2, 0, 3)
     );
 
     rightWindow.vertices.push (
@@ -335,7 +340,7 @@ function createWindows() {
     let windows = new THREE.Object3D();
 
     leftWindow.computeVertexNormals();
-    material = new THREE.MeshLambertMaterial({side: THREE.DoubleSide});
+    material = new THREE.MeshLambertMaterial();
     mesh = new THREE.Mesh(leftWindow, material);
     obj = new THREE.Object3D();
     obj.add(mesh);
@@ -372,11 +377,11 @@ function createHeadlights() {
     );
 
     frontHeadlight.faces.push (
-        new THREE.Face3(0, 1, 2),
-        new THREE.Face3(3, 2, 1),
+        new THREE.Face3(2, 1, 0),
+        new THREE.Face3(1, 2, 3),
 
-        new THREE.Face3(6, 5, 4),
-        new THREE.Face3(5, 6, 7),
+        new THREE.Face3(4, 5, 6),
+        new THREE.Face3(7, 6, 5),
 
         new THREE.Face3(2, 6, 7),
         new THREE.Face3(7, 3, 2)
@@ -398,7 +403,7 @@ function createHeadlights() {
     let headLights = new THREE.Object3D();
 
     frontHeadlight.computeVertexNormals();
-    material = new THREE.MeshLambertMaterial({side: THREE.DoubleSide});
+    material = new THREE.MeshLambertMaterial();
     mesh = new THREE.Mesh(frontHeadlight, material);
     obj = new THREE.Object3D();
     obj.add(mesh);
@@ -422,11 +427,17 @@ function createLights(x, y, z) {
 
     scene.add(lightbox);
 
-    const spotLight = new THREE.SpotLight(0xffffff);
+    const spotLight = new THREE.SpotLight(0xffffff, 0.7);
     spotLight.position.set(lightbox.position.x, lightbox.position.y, lightbox.position.z);
     spotLight.target.position.set(0, 0, 0);
     spotLight.castShadow = true;
-
+    spotLight.shadow.mapSize.width = 2048; 
+    spotLight.shadow.mapSize.height = 2048; 
+    spotLight.shadow.camera.near = 0.5;
+    spotLight.shadow.camera.far = 200;
+    spotLight.shadow.radius = 1.5;
+    spotLight.shadow.type = THREE.PCFSoftShadowMap;
+ 
     return spotLight;
 }
 
@@ -454,7 +465,7 @@ function createScene() {
     rotateCarAndStage.add(stage);
 
     scene.add(rotateCarAndStage);
-
+    
     let l1 = createLights(20,20,0);
     scene.add(l1);
     scene.add(l1.target);
@@ -467,9 +478,9 @@ function createScene() {
     scene.add(l3);
     scene.add(l3.target);
 
-    let directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
+    let directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
     directionalLight.position.set(1, 1, 1);
-    directionalLight.shadow = true;
+    directionalLight.castShadow = true;
     scene.add(directionalLight);
 }
 
@@ -477,10 +488,10 @@ function createCamera() {
 	'use strict';
 	const cameraSize = 25;
 	//camera = new THREE.OrthographicCamera(-cameraSize, cameraSize, cameraSize*aspectRatio, -cameraSize*aspectRatio, 1, 1000);
-	camera = new THREE.PerspectiveCamera(70,  window.innerWidth / window.innerHeight, 1, 1000);
-    camera.position.x = 20;
-    camera.position.y = 20;
-	camera.position.z = 20;
+	camera = new THREE.PerspectiveCamera(60,  window.innerWidth / window.innerHeight, 1, 1000);
+    camera.position.x = -30;
+    camera.position.y = 30;
+	camera.position.z = -30;
     camera.lookAt(scene.position);
 }
 
@@ -547,9 +558,10 @@ function render() {
 function init() {
     'use strict';
     renderer = new THREE.WebGLRenderer({
-        antialias: true
+        antialias: true,
     });
     renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.shadowMap.enabled = true;
     document.body.appendChild(renderer.domElement);
 
     createScene();
