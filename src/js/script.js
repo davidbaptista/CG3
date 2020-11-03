@@ -14,6 +14,8 @@ let perspective = true;
 
 const cameraSize = 35;
 
+let meshList = [];
+
 function createFloor(s) {
 	'use strict';
 
@@ -22,6 +24,7 @@ function createFloor(s) {
     mesh = new THREE.Mesh(geometry, material);
     mesh.castShadow = true;
     mesh.receiveShadow = true;
+    meshList.push(mesh);
 
     mesh.position.set(0, 0, 0);
 	obj = new THREE.Object3D();
@@ -54,26 +57,39 @@ function createCylinder(w, h) {
 function createBox(l, h, w) {
     'use strict';
 
-    geometry = new THREE.CubeGeometry(l, h, w);
-    material = new THREE.MeshPhongMaterial({color: 0x3D3D3D});
-    mesh = new THREE.Mesh(geometry, material);
+    geometry = new THREE.BoxGeometry(l, h, w);
+    let materials = [
+        new THREE.MeshBasicMaterial({color: 0x3D3D3D, side: THREE.DoubleSide}),
+        new THREE.MeshLambertMaterial({color: 0x3D3D3D}),
+        new THREE.MeshPhongMaterial({color: 0x3D3D3D}),
+    ];
+    mesh = new THREE.Mesh(geometry, materials);
     mesh.position.set(0, 0, 0);
     mesh.castShadow = true;
     mesh.receiveShadow = true;
-	
-	obj = new THREE.Object3D();
-	obj.add(mesh);
+    console.log(mesh);
 
-	return obj;
+    for(let j = 0; j < mesh.geometry.faces.length; j++){
+        mesh.geometry.faces[j].materialIndex = 0;
+    }
+
+    meshList.push(mesh);
+	
+	return mesh;
 }
 
 function createSphere(r) {
 	'use strict'
 
-	geometry = new THREE.SphereGeometry(r, 16, 16)
-	material = new THREE.MeshPhongMaterial({color: 0x303030, wireframe: false});
-	mesh = new THREE.Mesh(geometry, material);
+    geometry = new THREE.SphereGeometry(r, 16, 16)
+    let materials = [
+        new THREE.MeshBasicMaterial({color: 0x303030}),
+        new THREE.MeshLambertMaterial({color: 0x303030}),
+        new THREE.MeshPhongMaterial({color: 0x303030}),
+    ];
+	mesh = new THREE.Mesh(geometry, materials);
     mesh.position.set(0, 0, 0);
+    meshList.push(mesh);
     obj = new THREE.Object3D();
 	obj.add(mesh);
 
@@ -83,14 +99,19 @@ function createSphere(r) {
 function createCone(r) {
 	'use strict'
 
-	geometry = new THREE.ConeGeometry(r, r, 32)
-	material = new THREE.MeshPhongMaterial({color: 0x303030, wireframe: false});
-	mesh = new THREE.Mesh(geometry, material);
+    geometry = new THREE.ConeGeometry(r, r, 32);
+    let materials = [
+        new THREE.MeshBasicMaterial({color: 0x303030}),
+        new THREE.MeshLambertMaterial({color: 0x303030}),
+        new THREE.MeshPhongMaterial({color: 0x303030}),
+    ];
+	mesh = new THREE.Mesh(geometry, materials);
     mesh.position.set(0, 0, 0);
+    meshList.push(mesh);
     obj = new THREE.Object3D();
 	obj.add(mesh);
 
-	return obj;
+	return mesh;
 }
 
 function createChassis() {
@@ -181,9 +202,10 @@ function createChassis() {
 	obj.add(c1);
 	obj.add(c2);
 	obj.add(c3);
-	obj.add(c4);
-	
-	obj.translateX(7.75);
+    obj.add(c4);
+    
+	obj.rotateY(Math.PI);
+	obj.translateX(-16.25);
     return obj;
 }
 
@@ -287,11 +309,15 @@ function createBody() {
 		
  
     body.computeVertexNormals();
-    //body.normalize();
-    material = new THREE.MeshPhongMaterial({color:0x808080});
-    mesh = new THREE.Mesh(body, material)
+    let materials = [
+        new THREE.MeshBasicMaterial({color: 0x404040}), //specular: 0xc5c5c5
+        new THREE.MeshLambertMaterial({color: 0x404040}),
+        new THREE.MeshPhongMaterial({color: 0x404040}),
+    ];
+    mesh = new THREE.Mesh(body, materials)
     mesh.castShadow = true;
     mesh.receiveShadow = true;
+    meshList.push(mesh);
     obj = new THREE.Object3D();
     obj.add(mesh);
 
@@ -344,21 +370,31 @@ function createWindows() {
     let windows = new THREE.Object3D();
 
     leftWindow.computeVertexNormals();
-    material = new THREE.MeshLambertMaterial();
-    mesh = new THREE.Mesh(leftWindow, material);
+    let materials = [
+        new THREE.MeshBasicMaterial({color: 0xa3a3a3}), //specular: 0xc5c5c5
+        new THREE.MeshLambertMaterial({color: 0xa3a3a3}),
+        new THREE.MeshPhongMaterial({color: 0xa3a3a3}),
+    ];
+    mesh = new THREE.Mesh(leftWindow, materials);
+    mesh.receiveShadow = true;
+    mesh.castShadow = true;
     obj = new THREE.Object3D();
-    obj.add(mesh);
-    windows.add(obj);
+    meshList.push(mesh);
+    windows.add(mesh);
 
     rightWindow.computeVertexNormals();
-    mesh = new THREE.Mesh(rightWindow, material);
-    obj.add(mesh);
-    windows.add(obj);
+    mesh = new THREE.Mesh(rightWindow, materials);
+    mesh.receiveShadow = true;
+    mesh.castShadow = true;
+    meshList.push(mesh);
+    windows.add(mesh);
 
     frontWindow.computeVertexNormals();
-    mesh = new THREE.Mesh(frontWindow, material);
-    obj.add(mesh);
-    windows.add(obj);
+    mesh = new THREE.Mesh(frontWindow, materials);
+    mesh.receiveShadow = true;
+    mesh.castShadow = true;
+    meshList.push(mesh);
+    windows.add(mesh);
 
     return windows;
 }
@@ -407,16 +443,31 @@ function createHeadlights() {
     let headLights = new THREE.Object3D();
 
     frontHeadlight.computeVertexNormals();
-    material = new THREE.MeshLambertMaterial();
-    mesh = new THREE.Mesh(frontHeadlight, material);
+    let materials1 = [
+        new THREE.MeshBasicMaterial({color: 0xF0F0F0}),
+        new THREE.MeshLambertMaterial({color: 0xF0F0F0}),
+        new THREE.MeshPhongMaterial({color: 0xF0F0F0}),
+    ];
+    mesh = new THREE.Mesh(frontHeadlight, materials1);
+    mesh.receiveShadow = true;
+    mesh.castShadow = true;
     obj = new THREE.Object3D();
-    obj.add(mesh);
+    obj.add(mesh)
+    meshList.push(mesh);;
     headLights.add(obj);
 
     backHeadlight.computeVertexNormals();
-    mesh = new THREE.Mesh(backHeadlight, material);
+    let materials2 = [
+        new THREE.MeshBasicMaterial({color: 0xFF0000}),
+        new THREE.MeshLambertMaterial({color: 0xFF0000}),
+        new THREE.MeshPhongMaterial({color: 0xFF0000}),
+    ];
+    mesh = new THREE.Mesh(backHeadlight, materials2);
+    mesh.receiveShadow = true;
+    mesh.castShadow = true;
     obj = new THREE.Object3D();
     obj.add(mesh);
+    meshList.push(mesh);
     headLights.add(obj);
 
     return headLights;
@@ -470,6 +521,7 @@ function createScene() {
 
     scene.add(rotateCarAndStage);
     
+    
     let l1 = createLights(20,20,0);
     scene.add(l1);
     scene.add(l1.target);
@@ -481,11 +533,12 @@ function createScene() {
     let l3 = createLights(-10,20,-17);
     scene.add(l3);
     scene.add(l3.target);
-
-    let directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
-    directionalLight.position.set(1, 1, 1);
+    
+    let directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    directionalLight.position.set(15, 1, 15);
     directionalLight.castShadow = true;
     scene.add(directionalLight);
+    
 }
 
 function createCamera() {
@@ -532,11 +585,16 @@ function onKeyDown(e) {
         break;
     case 69:  //E
     case 101: //e
-        scene.traverse(function (node) {
-            if (node instanceof THREE.AxisHelper) {
-                node.visible = !node.visible;
+        for(let i = 0; i < meshList.length; i++){
+            for(let j = 0; j < meshList[i].geometry.__directGeometry.groups.length; j++){
+                if(meshList[i].geometry.__directGeometry.groups[j].materialIndex == 0){
+                    meshList[i].geometry.__directGeometry.groups[j].materialIndex = 1;
+                }
+                else {
+                    meshList[i].geometry.__directGeometry.groups[j].materialIndex = 0;
+                }
             }
-        });
+        }
 		break;
 	case 49: // 1
 		break;
