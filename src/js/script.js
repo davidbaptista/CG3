@@ -8,7 +8,11 @@ let rotate = [0, 0], lights = [0, 0, 0];
 
 let clock = new THREE.Clock();
 
-const aspectRatio = window.innerHeight / window.innerWidth;
+let aspectRatio = window.innerHeight / window.innerWidth;
+
+let perspective = true;
+
+const cameraSize = 35;
 
 function createFloor(s) {
 	'use strict';
@@ -486,7 +490,6 @@ function createScene() {
 
 function createCamera() {
 	'use strict';
-	const cameraSize = 25;
 	//camera = new THREE.OrthographicCamera(-cameraSize, cameraSize, cameraSize*aspectRatio, -cameraSize*aspectRatio, 1, 1000);
 	camera = new THREE.PerspectiveCamera(60,  window.innerWidth / window.innerHeight, 1, 1000);
     camera.position.x = -30;
@@ -500,10 +503,18 @@ function onResize() {
 
     renderer.setSize(window.innerWidth, window.innerHeight);
 
-    if (window.innerHeight > 0 && window.innerWidth > 0) {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-    }
+	if(perspective) {
+		if (window.innerHeight > 0 && window.innerWidth > 0) {
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+		}
+	}
+	else {
+		aspectRatio = window.innerHeight / window.innerWidth;
+		camera.top = cameraSize * aspectRatio;
+		camera.bottom = cameraSize * - aspectRatio;
+		camera.updateProjectionMatrix();
+	}
 
 }
 
@@ -526,7 +537,29 @@ function onKeyDown(e) {
                 node.visible = !node.visible;
             }
         });
-        break;
+		break;
+	case 49: // 1
+		break;
+	case 50: // 2
+		break;
+	case 51: // 3
+		break;
+	case 52: // 4
+		perspective = true;
+		camera = new THREE.PerspectiveCamera(60,  window.innerWidth / window.innerHeight, 1, 1000);
+		camera.position.x = -30;
+		camera.position.y = 30;
+		camera.position.z = -30;
+		camera.lookAt(scene.position);
+		break;
+	case 53: // 5
+		perspective = false;
+		camera = new THREE.OrthographicCamera(-cameraSize, cameraSize, cameraSize*aspectRatio, -cameraSize*aspectRatio, 1, 1000);
+		camera.position.x = 0;
+		camera.position.y = 0;
+		camera.position.z = 20;
+		camera.lookAt(scene.position);
+		break;
     case 37: //<-
         rotate[0] = 1;
             break;
