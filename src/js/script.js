@@ -16,6 +16,10 @@ const cameraSize = 35;
 
 let meshList = [];
 
+let shadowsActivated = false;
+
+let lastShadow = 1;
+
 function createFloor(s) {
 	'use strict';
 
@@ -575,26 +579,41 @@ function onKeyDown(e) {
     'use strict';
 
     switch (e.keyCode) {
-    case 65: //A
-    case 97: //a
-        scene.traverse(function (node) {
-            if (node instanceof THREE.Mesh) {
-                node.material.wireframe = !node.material.wireframe;
-            }
-        });
-        break;
+	case 81:  //q
+		
+		break;
+	case 87: // w
+		shadowsActivated = !shadowsActivated;
+		let x;
+		if(shadowsActivated) {
+			x = lastShadow;
+		}
+		else {
+			x = 0;
+		}
+
+		for(let i = 0; i < meshList.length; i++) {
+			for(let j = 0; j < meshList[i].geometry.__directGeometry.groups.length; j++){
+				meshList[i].geometry.__directGeometry.groups[j].materialIndex = x;
+			}
+		}
+		break;
     case 69:  //E
-    case 101: //e
-        for(let i = 0; i < meshList.length; i++){
-            for(let j = 0; j < meshList[i].geometry.__directGeometry.groups.length; j++){
-                if(meshList[i].geometry.__directGeometry.groups[j].materialIndex == 0){
-                    meshList[i].geometry.__directGeometry.groups[j].materialIndex = 1;
-                }
-                else {
-                    meshList[i].geometry.__directGeometry.groups[j].materialIndex = 0;
-                }
-            }
-        }
+	case 101: //e
+		if(shadowsActivated) {
+			for(let i = 0; i < meshList.length; i++) {
+				for(let j = 0; j < meshList[i].geometry.__directGeometry.groups.length; j++) {
+					if(meshList[i].geometry.__directGeometry.groups[j].materialIndex == 1){
+						meshList[i].geometry.__directGeometry.groups[j].materialIndex = 2;
+						lastShadow = 2;
+					}
+					else {
+						meshList[i].geometry.__directGeometry.groups[j].materialIndex = 1;
+						lastShadow = 1;
+					}
+				}
+			}
+		}
 		break;
 	case 49: // 1
 		break;
