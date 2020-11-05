@@ -192,20 +192,20 @@ function createChassis() {
 	b12.translateZ(-3);
 	b12.rotateY(Math.PI / 2);
 
-	let c1 = createCylinder(2, 1.5, 0xBDC0C7);
+	let c1 = createCylinder(2, 1.5, 0x303030);
 	c1.translateX(-4.5);
 	c1.translateZ(5);
 	c1.rotateX(Math.PI / 2);
-	let c2 = createCylinder(2, 1.5, 0xBDC0C7);
+	let c2 = createCylinder(2, 1.5, 0x303030);
 	c2.translateX(-4.5);
 	c2.translateZ(-5);
 	c2.rotateX(-Math.PI / 2);
 
-	let c3 = createCylinder(2, 1.5, 0xBDC0C7);
+	let c3 = createCylinder(2, 1.5, 0x303030);
 	c3.translateX(13.5);
 	c3.translateZ(5);
 	c3.rotateX(Math.PI / 2);
-	let c4 = createCylinder(2, 1.5, 0xBDC0C7);
+	let c4 = createCylinder(2, 1.5, 0x303030);
 	c4.translateX(13.5);
 	c4.translateZ(-5);
     c4.rotateX(-Math.PI / 2);
@@ -336,12 +336,11 @@ function createBody() {
 
 		);
 		
- 
     body.computeVertexNormals();
     let materials = [
         new THREE.MeshBasicMaterial({color: 0x404040}), //specular: 0xc5c5c5
-        new THREE.MeshLambertMaterial({color: 0x404040}),
-        new THREE.MeshPhongMaterial({color: 0x404040}),
+        new THREE.MeshLambertMaterial({color: 0x404040, specular: 0x888888}),
+        new THREE.MeshPhongMaterial({color: 0x404040, specular: 0x888888}),
     ];
     mesh = new THREE.Mesh(body, materials)
     mesh.castShadow = true;
@@ -400,9 +399,9 @@ function createWindows() {
 
     leftWindow.computeVertexNormals();
     let materials = [
-        new THREE.MeshBasicMaterial({color: 0xa3a3a3}), //specular: 0xc5c5c5
-        new THREE.MeshLambertMaterial({color: 0xa3a3a3}),
-        new THREE.MeshPhongMaterial({color: 0xa3a3a3}),
+        new THREE.MeshBasicMaterial({color: 0x000000}), //specular: 0xc5c5c5
+        new THREE.MeshLambertMaterial({color: 0x000000, specular: 0xFFFFFF}),
+        new THREE.MeshPhongMaterial({color: 0x000000, specular: 0xFFFFFF}),
     ];
     mesh = new THREE.Mesh(leftWindow, materials);
     mesh.receiveShadow = true;
