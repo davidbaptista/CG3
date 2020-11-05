@@ -338,9 +338,9 @@ function createBody() {
 		
     body.computeVertexNormals();
     let materials = [
-        new THREE.MeshBasicMaterial({color: 0x404040}), //specular: 0xc5c5c5
-        new THREE.MeshLambertMaterial({color: 0x404040, specular: 0x888888}),
-        new THREE.MeshPhongMaterial({color: 0x404040, specular: 0x888888}),
+        new THREE.MeshBasicMaterial({color: 0x999999}), //specular: 0xc5c5c5
+        new THREE.MeshLambertMaterial({color: 0x999999, specular: 0x444444, shininess: 30}),
+        new THREE.MeshPhongMaterial({color: 0x999999, specular: 0x444444, shininess: 30}),
     ];
     mesh = new THREE.Mesh(body, materials)
     mesh.castShadow = true;
@@ -399,9 +399,9 @@ function createWindows() {
 
     leftWindow.computeVertexNormals();
     let materials = [
-        new THREE.MeshBasicMaterial({color: 0x000000}), //specular: 0xc5c5c5
-        new THREE.MeshLambertMaterial({color: 0x000000, specular: 0xFFFFFF}),
-        new THREE.MeshPhongMaterial({color: 0x000000, specular: 0xFFFFFF}),
+        new THREE.MeshBasicMaterial({color: 0x303030}), //specular: 0xc5c5c5
+        new THREE.MeshLambertMaterial({color: 0x303030, specular: 0xFFFFFF}),
+        new THREE.MeshPhongMaterial({color: 0x303030, specular: 0xFFFFFF}),
     ];
     mesh = new THREE.Mesh(leftWindow, materials);
     mesh.receiveShadow = true;
@@ -529,8 +529,6 @@ function createScene() {
 
     scene = new THREE.Scene();
 
-	scene.add(new THREE.AxisHelper(10));
-
 	createFloor(70);
     let stage = createCylinder(15, 2, 0x6B611F);
     let car = new THREE.Object3D();
@@ -546,7 +544,6 @@ function createScene() {
     rotateCarAndStage.add(stage);
 
     scene.add(rotateCarAndStage);
-    
     
     let l1 = createLights(20,20,0);
     scene.add(l1);
@@ -567,15 +564,14 @@ function createScene() {
     directionalLight.position.set(15, 1, 15);
     directionalLight.castShadow = true;
     scene.add(directionalLight);
-    
 }
 
 function createCamera() {
 	'use strict';
 	camera = new THREE.PerspectiveCamera(60,  window.innerWidth / window.innerHeight, 1, 1000);
-    camera.position.x = -40;
+    camera.position.x = -30;
     camera.position.y = 20;
-	camera.position.z = -40;
+	camera.position.z = -30;
     camera.lookAt(scene.position);
 }
 
@@ -678,14 +674,14 @@ function onKeyDown(e) {
 	case 52: // 4
 		perspective = true;
 		camera = new THREE.PerspectiveCamera(60,  window.innerWidth / window.innerHeight, 1, 1000);
-		camera.position.x = -40;
+		camera.position.x = -30;
 		camera.position.y = 20;
-		camera.position.z = -40;
+		camera.position.z = -30;
 		camera.lookAt(scene.position);
 		break;
 	case 53: // 5
 		perspective = false;
-		camera = new THREE.OrthographicCamera(-cameraSize, cameraSize, cameraSize*aspectRatio, -cameraSize*aspectRatio, 1, 1000);
+		camera = new THREE.OrthographicCamera(-cameraSize, cameraSize, cameraSize*aspectRatio, -cameraSize*aspectRatio, 0.1, 1000);
 		camera.position.x = 0;
 		camera.position.y = 0;
 		camera.position.z = 20;
@@ -730,7 +726,6 @@ function init() {
 
     createScene();
     createCamera();
-
     render();
 
     window.addEventListener("keydown", onKeyDown);
@@ -744,7 +739,13 @@ function animate() {
     let delta = 0;
     delta = clock.getDelta();
     rotateCarAndStage.rotateY(rotationSpeed * delta * (rotate[0] - rotate[1]));
+    if (!perspective) {
+        let direction = new THREE.Vector3(0, 0, 1);
+        direction = direction.applyEuler(rotateCarAndStage.rotation);
+        camera.position.x = 40 * direction.x;
+        camera.position.z = 40 * direction.z;
+        camera.lookAt(rotateCarAndStage.position);
+    }
     render();
-
     requestAnimationFrame(animate);
 }
