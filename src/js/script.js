@@ -20,13 +20,24 @@ let shadowsActivated = false;
 
 let lastShadow = 1;
 
+let directionalLight;
+
+let directionalOn = true;
+
+let spotlights = [];
+
+let spotlightsOn = [true, true, true];
+
 function createFloor(s) {
 	'use strict';
 
 	geometry = new THREE.PlaneGeometry(s, s, 1);
-	material = new THREE.MeshStandardMaterial({color: 0x78829C, wireframe: false});
-    mesh = new THREE.Mesh(geometry, material);
-    mesh.castShadow = true;
+	let materials = [
+        new THREE.MeshBasicMaterial({color: 0x78829C, side: THREE.DoubleSide}),
+        new THREE.MeshLambertMaterial({color: 0x78829C}),
+        new THREE.MeshPhongMaterial({color: 0x78829C}),
+    ];
+    mesh = new THREE.Mesh(geometry, materials);
     mesh.receiveShadow = true;
     meshList.push(mesh);
 
@@ -35,24 +46,35 @@ function createFloor(s) {
 	obj.add(mesh);
 
 	scene.add(obj);
-
+	for(let j = 0; j < mesh.geometry.faces.length; j++){
+        mesh.geometry.faces[j].materialIndex = 0;
+	}
 	obj.rotateX(-Math.PI / 2);
 
 	return obj;
 }
 
-function createCylinder(w, h) {
+function createCylinder(w, h, color) {
 	'use strict';
 
-    geometry = new THREE.CylinderGeometry(w, w, h, 64);
-	material = new THREE.MeshStandardMaterial({color: 0xBDC0C7});
-    mesh = new THREE.Mesh(geometry, material);
+	geometry = new THREE.CylinderGeometry(w, w, h, 64);
+	let materials = [
+        new THREE.MeshBasicMaterial({color: color}),
+        new THREE.MeshLambertMaterial({color: color}),
+        new THREE.MeshPhongMaterial({color: color}),
+    ];
+    mesh = new THREE.Mesh(geometry, materials);
     mesh.receiveShadow = true;
     mesh.castShadow = true;
 	mesh.position.set(0, 0, 0);
 	obj = new THREE.Object3D();
     obj.add(mesh);
+    meshList.push(mesh);
 
+    for(let j = 0; j < mesh.geometry.faces.length; j++){
+        mesh.geometry.faces[j].materialIndex = 0;
+	}
+	
 	scene.add(obj);
 
 	return obj;
@@ -71,7 +93,6 @@ function createBox(l, h, w) {
     mesh.position.set(0, 0, 0);
     mesh.castShadow = true;
     mesh.receiveShadow = true;
-    console.log(mesh);
 
     for(let j = 0; j < mesh.geometry.faces.length; j++){
         mesh.geometry.faces[j].materialIndex = 0;
@@ -171,20 +192,20 @@ function createChassis() {
 	b12.translateZ(-3);
 	b12.rotateY(Math.PI / 2);
 
-	let c1 = createCylinder(2, 1.5);
+	let c1 = createCylinder(2, 1.5, 0xBDC0C7);
 	c1.translateX(-4.5);
 	c1.translateZ(5);
 	c1.rotateX(Math.PI / 2);
-	let c2 = createCylinder(2, 1.5);
+	let c2 = createCylinder(2, 1.5, 0xBDC0C7);
 	c2.translateX(-4.5);
 	c2.translateZ(-5);
 	c2.rotateX(-Math.PI / 2);
 
-	let c3 = createCylinder(2, 1.5);
+	let c3 = createCylinder(2, 1.5, 0xBDC0C7);
 	c3.translateX(13.5);
 	c3.translateZ(5);
 	c3.rotateX(Math.PI / 2);
-	let c4 = createCylinder(2, 1.5);
+	let c4 = createCylinder(2, 1.5, 0xBDC0C7);
 	c4.translateX(13.5);
 	c4.translateZ(-5);
     c4.rotateX(-Math.PI / 2);
@@ -309,6 +330,10 @@ function createBody() {
 		// reat top part
 		new THREE.Face3(4, 4+11, 5),
 		new THREE.Face3(5, 4+11, 5+11),
+
+		new THREE.Face3(11, 0, 22),
+		new THREE.Face3(22, 25, 11),
+
 		);
 		
  
@@ -490,8 +515,8 @@ function createLights(x, y, z) {
     spotLight.position.set(lightbox.position.x, lightbox.position.y, lightbox.position.z);
     spotLight.target.position.set(0, 0, 0);
     spotLight.castShadow = true;
-    spotLight.shadow.mapSize.width = 2048; 
-    spotLight.shadow.mapSize.height = 2048; 
+    spotLight.shadow.mapSize.width = 4096; 
+    spotLight.shadow.mapSize.height = 4096; 
     spotLight.shadow.camera.near = 0.5;
     spotLight.shadow.camera.far = 200;
     spotLight.shadow.radius = 1.5;
@@ -508,9 +533,7 @@ function createScene() {
 	scene.add(new THREE.AxisHelper(10));
 
 	createFloor(70);
-    let stage = createCylinder(15, 2);
-    stage.children[0].material.receiveShadow = true;
-    stage.children[0].material.color.setHex(0x6B611F);
+    let stage = createCylinder(15, 2, 0x6B611F);
     let car = new THREE.Object3D();
     car.add(createChassis());
     car.add(createBody());
@@ -529,16 +552,19 @@ function createScene() {
     let l1 = createLights(20,20,0);
     scene.add(l1);
     scene.add(l1.target);
+	spotlights[0] = l1;
 
     let l2 = createLights(-10,20,17);
     scene.add(l2);
     scene.add(l2.target);
+	spotlights[1] = l2;
 
     let l3 = createLights(-10,20,-17);
     scene.add(l3);
     scene.add(l3.target);
-    
-    let directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+	spotlights[2] = l3;
+
+    directionalLight = new THREE.DirectionalLight(0xffffff, 1);
     directionalLight.position.set(15, 1, 15);
     directionalLight.castShadow = true;
     scene.add(directionalLight);
@@ -547,11 +573,10 @@ function createScene() {
 
 function createCamera() {
 	'use strict';
-	//camera = new THREE.OrthographicCamera(-cameraSize, cameraSize, cameraSize*aspectRatio, -cameraSize*aspectRatio, 1, 1000);
 	camera = new THREE.PerspectiveCamera(60,  window.innerWidth / window.innerHeight, 1, 1000);
-    camera.position.x = -30;
-    camera.position.y = 30;
-	camera.position.z = -30;
+    camera.position.x = -40;
+    camera.position.y = 20;
+	camera.position.z = -40;
     camera.lookAt(scene.position);
 }
 
@@ -580,7 +605,13 @@ function onKeyDown(e) {
 
     switch (e.keyCode) {
 	case 81:  //q
-		
+		if(directionalOn) {
+			directionalLight.color.setHex(0x000000);
+		}
+		else {
+			directionalLight.color.setHex(0xFFFFFF);
+		}
+		directionalOn = !directionalOn;
 		break;
 	case 87: // w
 		shadowsActivated = !shadowsActivated;
@@ -616,17 +647,41 @@ function onKeyDown(e) {
 		}
 		break;
 	case 49: // 1
+		if(spotlightsOn[0]) {
+			spotlights[0].color.setHex(0x000000);
+		}
+		else {
+			spotlights[0].color.setHex(0xFFFFFF);
+		}
+
+		spotlightsOn[0] = !spotlightsOn[0];
 		break;
 	case 50: // 2
+		if(spotlightsOn[1]) {
+			spotlights[1].color.setHex(0x000000);
+		}
+		else {
+			spotlights[1].color.setHex(0xFFFFFF);
+		}
+
+		spotlightsOn[1] = !spotlightsOn[1];
 		break;
 	case 51: // 3
+		if(spotlightsOn[2]) {
+			spotlights[2].color.setHex(0x000000);
+		}
+		else {
+			spotlights[2].color.setHex(0xFFFFFF);
+		}
+
+		spotlightsOn[2] = !spotlightsOn[2];
 		break;
 	case 52: // 4
 		perspective = true;
 		camera = new THREE.PerspectiveCamera(60,  window.innerWidth / window.innerHeight, 1, 1000);
-		camera.position.x = -30;
-		camera.position.y = 30;
-		camera.position.z = -30;
+		camera.position.x = -40;
+		camera.position.y = 20;
+		camera.position.z = -40;
 		camera.lookAt(scene.position);
 		break;
 	case 53: // 5
@@ -639,10 +694,10 @@ function onKeyDown(e) {
 		break;
     case 37: //<-
         rotate[0] = 1;
-            break;
+		break;
     case 39: //->
         rotate[1] = 1;
-            break;
+		break;
     }
 }
 
