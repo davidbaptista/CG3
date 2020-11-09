@@ -328,7 +328,7 @@ function createBody() {
 		new THREE.Face3(3+11, 4, 3),
 		new THREE.Face3(4, 3+11, 4+11),
 
-		// reat top part
+		// rear top part
 		new THREE.Face3(4, 4+11, 5),
 		new THREE.Face3(5, 4+11, 5+11),
 
@@ -343,7 +343,7 @@ function createBody() {
     let materials = [
         new THREE.MeshBasicMaterial({color: 0x999999}), 
         new THREE.MeshLambertMaterial({color: 0x999999}),
-        new THREE.MeshPhongMaterial({color: 0x999999, specular: 0x444444, shininess: 30}),
+        new THREE.MeshPhongMaterial({color: 0x999999, specular: 0x444444}),
     ];
     mesh = new THREE.Mesh(body, materials)
     mesh.castShadow = true;
@@ -487,8 +487,8 @@ function createHeadlights() {
     mesh.receiveShadow = true;
     mesh.castShadow = true;
     obj = new THREE.Object3D();
-    obj.add(mesh)
-    meshList.push(mesh);;
+    obj.add(mesh);
+    meshList.push(mesh);
     headLights.add(obj);
 
     backHeadlight.computeFaceNormals();    
@@ -737,7 +737,6 @@ function animate() {
     let delta = 0;
     delta = clock.getDelta();
     rotateCarAndStage.rotateY(rotationSpeed * delta * (rotate[0] - rotate[1]));
-    //rotateCarAndStage.position.x += 0.2;
     if (!perspective) {
         let direction = new THREE.Vector3(0, 0, 1);
         direction = direction.applyEuler(rotateCarAndStage.rotation);
