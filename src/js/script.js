@@ -31,11 +31,11 @@ let spotlightsOn = [true, true, true];
 function createFloor(s) {
 	'use strict';
 
-	geometry = new THREE.PlaneGeometry(s, s, 1);
+	geometry = new THREE.PlaneGeometry(s, s, 64);
 	let materials = [
         new THREE.MeshBasicMaterial({color: 0x78829C, side: THREE.DoubleSide}),
-        new THREE.MeshLambertMaterial({color: 0x78829C}),
-        new THREE.MeshPhongMaterial({color: 0x78829C}),
+        new THREE.MeshLambertMaterial({color: 0x78829C, side: THREE.DoubleSide}),
+        new THREE.MeshPhongMaterial({color: 0x78829C, side: THREE.DoubleSide}),
     ];
     mesh = new THREE.Mesh(geometry, materials);
     mesh.receiveShadow = true;
@@ -45,7 +45,8 @@ function createFloor(s) {
 	obj = new THREE.Object3D();
 	obj.add(mesh);
 
-	scene.add(obj);
+    scene.add(obj);
+    
 	for(let j = 0; j < mesh.geometry.faces.length; j++){
         mesh.geometry.faces[j].materialIndex = 0;
 	}
@@ -334,13 +335,15 @@ function createBody() {
 		new THREE.Face3(11, 0, 22),
 		new THREE.Face3(22, 25, 11),
 
-		);
-		
+        );
+        
+    body.computeFaceNormals();	
     body.computeVertexNormals();
+    
     let materials = [
-        new THREE.MeshBasicMaterial({color: 0x999999}), //specular: 0xc5c5c5
-        new THREE.MeshLambertMaterial({color: 0x999999, specular: 0x444444, shininess: 30}),
-        new THREE.MeshPhongMaterial({color: 0x999999, specular: 0x444444, shininess: 30}),
+        new THREE.MeshBasicMaterial({color: 0x999999}), 
+        new THREE.MeshLambertMaterial({color: 0x999999, side: THREE.DoubleSide}),
+        new THREE.MeshPhongMaterial({color: 0x999999, specular: 0x444444, shininess: 30, side: THREE.DoubleSide}),
     ];
     mesh = new THREE.Mesh(body, materials)
     mesh.castShadow = true;
@@ -398,9 +401,10 @@ function createWindows() {
     let windows = new THREE.Object3D();
 
     leftWindow.computeVertexNormals();
+    leftWindow.computeFaceNormals();
     let materials = [
-        new THREE.MeshBasicMaterial({color: 0x303030}), //specular: 0xc5c5c5
-        new THREE.MeshLambertMaterial({color: 0x303030, specular: 0xFFFFFF}),
+        new THREE.MeshBasicMaterial({color: 0x303030}),
+        new THREE.MeshLambertMaterial({color: 0x303030}),
         new THREE.MeshPhongMaterial({color: 0x303030, specular: 0xFFFFFF}),
     ];
     mesh = new THREE.Mesh(leftWindow, materials);
@@ -411,6 +415,7 @@ function createWindows() {
     windows.add(mesh);
 
     rightWindow.computeVertexNormals();
+    rightWindow.computeFaceNormals();
     mesh = new THREE.Mesh(rightWindow, materials);
     mesh.receiveShadow = true;
     mesh.castShadow = true;
@@ -418,6 +423,7 @@ function createWindows() {
     windows.add(mesh);
 
     frontWindow.computeVertexNormals();
+    frontWindow.computeFaceNormals();
     mesh = new THREE.Mesh(frontWindow, materials);
     mesh.receiveShadow = true;
     mesh.castShadow = true;
@@ -470,6 +476,7 @@ function createHeadlights() {
 
     let headLights = new THREE.Object3D();
 
+    frontHeadlight.computeFaceNormals();
     frontHeadlight.computeVertexNormals();
     let materials1 = [
         new THREE.MeshBasicMaterial({color: 0xF0F0F0}),
@@ -484,6 +491,7 @@ function createHeadlights() {
     meshList.push(mesh);;
     headLights.add(obj);
 
+    backHeadlight.computeFaceNormals();    
     backHeadlight.computeVertexNormals();
     let materials2 = [
         new THREE.MeshBasicMaterial({color: 0xFF0000}),
@@ -520,7 +528,7 @@ function createLights(x, y, z) {
     spotLight.shadow.camera.far = 200;
     spotLight.shadow.radius = 1.5;
     spotLight.shadow.type = THREE.PCFSoftShadowMap;
- 
+    console.log(spotLight.shadow);
     return spotLight;
 }
 
@@ -560,9 +568,22 @@ function createScene() {
     scene.add(l3.target);
 	spotlights[2] = l3;
 
-    directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-    directionalLight.position.set(15, 1, 15);
+    directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+    directionalLight.position.set(15, 10, 15);
     directionalLight.castShadow = true;
+    directionalLight.autoUpdate = true;
+    
+    directionalLight.shadow.camera.near = 2;
+    directionalLight.shadow.camera.far = 100;
+    directionalLight.shadow.camera.left = -25;
+    directionalLight.shadow.camera.right = 25;
+    directionalLight.shadow.camera.top = 25;
+    directionalLight.shadow.camera.bottom = -25;
+    directionalLight.target.position.set(0, 0, 0);
+
+    directionalLight.shadow.mapSize.width = 2048;
+    directionalLight.shadow.mapSize.height = 2048;
+    
     scene.add(directionalLight);
 }
 
@@ -600,12 +621,8 @@ function onKeyDown(e) {
 
     switch (e.keyCode) {
 	case 81:  //q
-		if(directionalOn) {
-			directionalLight.color.setHex(0x000000);
-		}
-		else {
-			directionalLight.color.setHex(0xFFFFFF);
-		}
+
+        directionalLight.visible = !directionalLight.visible;
 		directionalOn = !directionalOn;
 		break;
 	case 87: // w
@@ -642,33 +659,15 @@ function onKeyDown(e) {
 		}
 		break;
 	case 49: // 1
-		if(spotlightsOn[0]) {
-			spotlights[0].color.setHex(0x000000);
-		}
-		else {
-			spotlights[0].color.setHex(0xFFFFFF);
-		}
-
+        spotlights[0].visible = !spotlights[0].visible;
 		spotlightsOn[0] = !spotlightsOn[0];
 		break;
 	case 50: // 2
-		if(spotlightsOn[1]) {
-			spotlights[1].color.setHex(0x000000);
-		}
-		else {
-			spotlights[1].color.setHex(0xFFFFFF);
-		}
-
+        spotlights[1].visible = !spotlights[1].visible;
 		spotlightsOn[1] = !spotlightsOn[1];
 		break;
 	case 51: // 3
-		if(spotlightsOn[2]) {
-			spotlights[2].color.setHex(0x000000);
-		}
-		else {
-			spotlights[2].color.setHex(0xFFFFFF);
-		}
-
+        spotlights[2].visible = !spotlights[2].visible;
 		spotlightsOn[2] = !spotlightsOn[2];
 		break;
 	case 52: // 4
@@ -711,7 +710,6 @@ function onKeyUp(e) {
 
 function render() {
     'use strict';
-    renderer.shadowMap.enabled = true;
     renderer.render(scene, camera);
 }
 
@@ -739,6 +737,7 @@ function animate() {
     let delta = 0;
     delta = clock.getDelta();
     rotateCarAndStage.rotateY(rotationSpeed * delta * (rotate[0] - rotate[1]));
+    //rotateCarAndStage.position.x += 0.2;
     if (!perspective) {
         let direction = new THREE.Vector3(0, 0, 1);
         direction = direction.applyEuler(rotateCarAndStage.rotation);
