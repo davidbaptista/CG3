@@ -342,8 +342,8 @@ function createBody() {
     
     let materials = [
         new THREE.MeshBasicMaterial({color: 0x999999}), 
-        new THREE.MeshLambertMaterial({color: 0x999999, side: THREE.DoubleSide}),
-        new THREE.MeshPhongMaterial({color: 0x999999, specular: 0x444444, shininess: 30, side: THREE.DoubleSide}),
+        new THREE.MeshLambertMaterial({color: 0x999999}),
+        new THREE.MeshPhongMaterial({color: 0x999999, specular: 0x444444, shininess: 30}),
     ];
     mesh = new THREE.Mesh(body, materials)
     mesh.castShadow = true;
